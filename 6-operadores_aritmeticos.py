@@ -1,0 +1,7 @@
+print(f"{1+2} soma")
+print(f"{1-2} subtração")
+print(f"{1/2} divisão")
+print(f"{1*2} multiplicação")
+print(f"{1//2} divisão com arredondamento")
+print(f"{1%2} modulo")
+print(f"{1**2} exponenciação")
