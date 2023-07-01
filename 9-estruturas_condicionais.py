@@ -1,5 +1,5 @@
 saldo = 7000
-saque = float(input("Informe o valo do saque: "))
+saque = float(input("Informe o valor do saque: "))
 
 if saldo >= saque:
     print("Saque realizado com sucesso!")
