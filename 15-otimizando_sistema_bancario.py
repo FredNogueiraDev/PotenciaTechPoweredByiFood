@@ -87,38 +87,32 @@ def menu_logado():
     return input(textwrap.dedent(menu_logado))
 
 #Depositar
-def depositar(saldo, valor, extrato, /):
+def depositar(saldo, valor, extrato):
     if valor > 0:
         saldo += valor
         extrato += f"Depósito:\tR$ {valor:.2f}\n"
-        print(f"Valor de R${valor:.2f} depositado com sucesso. \n")
+        print(f"Valor de R${valor:.2f} depositado com sucesso.\n")
     else:
-        print("Operação falhou! O valor informado é inválido. \n")
-
+        print("Operação falhou! O valor informado é inválido.\n")
     return saldo, extrato
 
-#Sacar
-def sacar(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
 
+#Sacar
+def sacar(saldo, valor, extrato, limite, numero_saques, limite_saques):
     if valor > saldo:
         print("Operação falhou! Saldo insuficiente. \n")
-
     elif valor > limite:
         print(f"Operação falhou! Só é possível realizar saques de até R${limite} \n")
-
     elif numero_saques >= limite_saques:
         print("Operação falhou! Número máximo de saques excedido. \n")
-
     elif valor > 0:
         saldo -= valor
         extrato += f"Saque:\t\tR$ {valor:.2f}\n"
         numero_saques += 1
         print(f"Valor de R${valor:.2f} sacado com sucesso. \n")
-
     else:
         print("Operação falhou! O valor informado é inválido. \n")
-
-    return saldo, extrato
+    return saldo, extrato, numero_saques
 
 #Extrato
 def exibir_extrato(saldo, /, *, extrato):
@@ -134,12 +128,24 @@ def main():
     usuarios = []
     contas = []
     logado = False
+    continuar = True  
 
-    while True:
+    saldo = 1000
+    limite = 500
+    extrato = ""
+    numero_saques = 0
+    
+    while continuar:
         opcao = menu_login()
 
         if opcao == "1":
             criar_usuario(usuarios)
+            
+            numero_conta = len(contas) + 1
+            conta = criar_conta(AGENCIA, numero_conta, usuarios)
+
+            if conta:
+                contas.append(conta)
 
         elif opcao == "2":
             listar_contas(contas)
@@ -152,43 +158,41 @@ def main():
                 contas.append(conta)
         
         elif opcao == "4":
-            login(usuarios)
+            logado = login(usuarios)
+            
+            if logado:
+                while True:
+                    LIMITE_SAQUES = 3
+                   
+                    opcao = menu_logado()
 
-            while True:
-                LIMITE_SAQUES = 3
+                    if opcao == "1":
+                        valor = float(input("Informe o valor do depósito: "))
 
-                saldo = 0
-                limite = 500
-                extrato = ""
-                numero_saques = 0
-                
-                opcao = menu_logado()
+                        saldo, extrato = depositar(saldo, valor=valor, extrato=extrato)
 
-                if opcao == "1":
-                    valor = float(input("Informe o valor do depósito: "))
+                    elif opcao == "2":
+                        valor = float(input("Informe o valor do saque: "))
 
-                    saldo, extrato = depositar(saldo, valor, extrato)
+                        saldo, extrato, numero_saques = sacar(
+                            saldo=saldo,
+                            valor=valor,
+                            extrato=extrato,
+                            limite=limite,
+                            numero_saques=numero_saques,
+                            limite_saques=LIMITE_SAQUES,
+                        )
 
-                elif opcao == "2":
-                    valor = float(input("Informe o valor do saque: "))
 
-                    saldo, extrato = sacar(
-                        saldo=saldo,
-                        valor=valor,
-                        extrato=extrato,
-                        limite=limite,
-                        numero_saques=numero_saques,
-                        limite_saques=LIMITE_SAQUES,
-                    )
+                    elif opcao == "3":
+                        exibir_extrato(saldo, extrato=extrato)
 
-                elif opcao == "3":
-                    exibir_extrato(saldo, extrato=extrato)
+                    elif opcao == "4":
+                        continuar = False  
+                        break
 
-                elif opcao == "4":
-                    break
-
-                else:
-                    print("Operação inválida, por favor selecione novamente a operação desejada.")
+                    else:
+                        print("Operação inválida, por favor selecione novamente a operação desejada.")
 
         elif opcao == "5":
             break
